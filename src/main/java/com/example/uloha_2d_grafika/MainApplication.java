@@ -23,11 +23,14 @@ public class MainApplication extends Application {
     public int speed = 10;
     double clickedX;
     double clickedY;
+    int wait = 0;
+    int death = 0;
 
     List<Pop> popList = new ArrayList<>();
 
     Image backgroundImage = null;
     Random random = new Random();
+
 
     GraphicsContext graphicsContext;
     Direction direction = Direction.upRight;
@@ -39,12 +42,14 @@ public class MainApplication extends Application {
         root.getChildren().add(canvas);
         graphicsContext = canvas.getGraphicsContext2D();
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
-
         scene.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             System.out.println("Clicked on x" + event.getX() + "y" + event.getY());
             clickedX = event.getX();
             clickedY = event.getY();
-            detectCollision(popList);
+            death=1;
+            System.out.println("click");
+
+
         });
 
         stage.setScene(scene);
@@ -75,6 +80,7 @@ public class MainApplication extends Application {
 
     private void tick() {
         int num = random.nextInt(5);
+        int number = 0;
         clearScreen();
         for (Pop p:
                 popList) {
@@ -122,7 +128,6 @@ public class MainApplication extends Application {
                         p.decrementX();
                         p.decrementY();
                     }
-
                     break;
                 case downRight:
                     stop = p.getX() < 0;
@@ -131,6 +136,20 @@ public class MainApplication extends Application {
                     break;
             }
             //detectCollision(p);
+            if (wait>=10){
+                detectCollision(popList);
+                wait=0;
+                death=0;
+
+            }
+                if (death != 1 && wait == 0) {
+                    p.loadTextures();
+                }
+                if (death == 1){
+                    wait+=1;
+                    p.loadDeathTextures();
+                }
+
             graphicsContext.drawImage(p.getImage(), p.x, p.y, p.height, p.height);
         }
 
